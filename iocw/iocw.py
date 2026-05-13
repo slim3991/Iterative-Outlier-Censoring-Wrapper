@@ -23,14 +23,16 @@ class IOCW(BaseEstimator, RegressorMixin):
 
         self.y_out = None
 
-    def _soft_threshold(self, x):
+    def _soft_threshold(self, values):
         if self.threshold is None:
-            abs_res = np.abs(x)
-            sigma = np.median(abs_res[abs_res < np.percentile(abs_res, 50)]) / 0.6745
-            lam = sigma * np.sqrt(2 * np.log(x.size))
+            abs_res = np.abs(values)
+            mad = np.median(abs_res)
+            sigma = mad / 0.6745
+            lam = sigma * np.sqrt(2 * np.log(values.size))
         else:
             lam = self.threshold
-        E = np.sign(x) * np.maximum(np.abs(x) - lam, 0)
+
+        E = np.sign(values) * np.maximum(np.abs(values) - lam, 0)
         return E
 
     def fit(self, X, y):
